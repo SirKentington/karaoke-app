@@ -1,0 +1,22 @@
+<style>
+table, th, td {
+    border: 1px solid black;
+    border-collapse: collapse;
+    padding-right: 5px;
+    padding-left: 5px;
+}
+</style>
+
+<center>
+
+<a href="/songs">Song List</a><p>
+<table>
+<tr><th> Singer </th> <th> Song </th>
+{% for item in queue %}
+<tr><td> <a href="/queue/display/{{item.key}}"> {{item.key}} </a> </td>
+    <td> {{item.data}}  </td>
+</tr>
+{% endfor %}
+
+</table>
+</center>

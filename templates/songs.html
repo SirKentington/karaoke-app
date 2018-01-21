@@ -1,0 +1,19 @@
+<style>
+table, th, td {
+    border: 1px solid black;
+    border-collapse: collapse;
+    padding-right: 5px;
+    padding-left: 5px;
+}
+</style>
+
+<center>
+<table>
+<tr><th> Artist </th> <th> Title </th>
+{% for song in songlist %}
+<tr><td> <a href="/songs/search?artist={{song.artist_url}}">{{song.artist}}</a> </td>
+    <td> {{song.title}}  </td></tr>
+{% endfor %}
+
+</table>
+</center>
