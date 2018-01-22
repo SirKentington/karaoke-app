@@ -1,0 +1,16 @@
+<center>
+<img src=/static/batman.jpg style="width:600px"><p>
+<a style="text-align:center" href="/queue/display">Queue</a><p>
+<a style="text-align:center" href=/songs/artist>All Songs by Artist</a><p>
+<a style="text-align:center" href=/songs/title>All Songs by Title</a><p>
+</center>
+
+Which Singer Are You?
+
+<div id="tfheader" style="text-align:center">
+    <form action="/songs/search" id="tfnewsearch" method="get">
+        <input type="text" class="tftextinput" id="tfnewsearch" name="query" size="21" maxlength="120" value="{{ searchtext }}">
+        <input type="submit" value="Search" class="tfbutton">
+    </form>
+<div class="tfclear"></div>
+</div>

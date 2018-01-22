@@ -16,8 +16,11 @@ songlist = songs.SongList(sys.argv[1])
 queue = fairqueue.FairQueue()
 
 for singer in ['Kent', 'Lisa', 'Nels', 'Frosty']:
-    for i in xrange(5):
-        queue.add(singer, ' '.join(songlist.random()))
+    for i in range(5):
+        song = songlist.random()
+        print song, song.title
+        queue.add(singer, song)
+        print queue
 
 # GENERIC STUFF
 def fmt(string):
@@ -60,34 +63,47 @@ def search():
     searchtext = ''
     artist = fmt(request.args.get('artist'))
     if artist is not None:
+        searchtext = artist
         results = songlist.all_by_artist(artist)
-        searchtext = artist
     else:
-        query = fmt(request.args.get('query')).split()
-        print 'SEARCHED WITH QUERY', query
-        results = songlist.search(query)
-        searchtext = artist
+        searchtext = fmt(request.args.get('query'))
+        print 'SEARCHED WITH QUERY', searchtext
+        results = songlist.search(searchtext.split())
     return search_box(searchtext) + render_template('songs.html', songlist=results)
 
 # QUEUE PART
 @app.route('/queue/display')
 def queue_display(all_singers=False):
     display_q = queue
+    tmp_queue = []
     singer = None
     if not all_singers:
         singer = fmt(request.args.get('singer'))
     if singer is not None:
         display_q = queue[singer]
-    return render_template('queue.html', queue=display_q)
+    tmp_queue = [(item.key, item.data) for item in display_q]
+    print tmp_queue
+    return render_template('queue.html', queue=tmp_queue)
 
 @app.route('/queue/display/<singer>')
 def queue_singer(singer):
     return render_template('singerqueue.html', queue=queue[singer])
 
+def recreate_url(base, args):
+    if len(args) == 0:
+        return base
+    return base + '?' + '&'.join(['%s=%s' % (v, args[v]) for v in args])
+
 @app.route('/queue/add')
 def queue_add():
+    name = request.cookies.get('karaoke_name')
+    if name is None:
+        return render_template('setname.html', desturl=recreate_url('/queue/add', request.args))
+    print 'NAME', name
     singer = fmt(request.args.get('singer'))
     song   = fmt(request.args.get('song'))
+    if singer is None or song is None:
+        return ''
     queue.add(singer, song)
     return queue_display()
 
