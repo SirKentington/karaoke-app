@@ -5,12 +5,13 @@ import random
 import re
 import urllib
 
-Song = namedtuple('Song', 'artist title artist_url title_url')
+Song = namedtuple('Song', 'artist title artist_url title_url sid')
 
 class SongList(object):
 
     def __init__(self, filename):
         print 'Reading in songlist'
+        sid = 0
         artist = ''
         title = ''
         artisturl = ''
@@ -27,7 +28,8 @@ class SongList(object):
                 artist = artist.decode('utf-8').strip()
                 title = title.decode('utf-8').strip()
                 #print 'Derp', artist, title, artist_url, title_url
-                songs.add(Song(artist, title, artist_url, title_url))
+                songs.add(Song(artist, title, artist_url, title_url, sid))
+                sid += 1
         songs = sorted(list(songs))
         self.artists = sorted(list(artists))
         self.songs = songs
@@ -52,6 +54,12 @@ class SongList(object):
         return self.artists
 
     def random(self):
-        return self.songs[random.randint(0, len(self.songs))]
+        return self[random.randint(0, len(self))]
+
+    def __getitem__(self, key):
+        return self.songs[key]
+
+    def __len__(self):
+        return len(self.songs)
 
 # vim: set expandtab sw=4 ts=4:
