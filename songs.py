@@ -18,6 +18,7 @@ class SongList(object):
         titleurl = ''
         songs = set()
         artists = set()
+        id_dict = {}
         with open(filename, 'r') as f:
             for line in f.readlines():
                 if line.isspace():
@@ -28,9 +29,12 @@ class SongList(object):
                 artist = artist.decode('utf-8').strip()
                 title = title.decode('utf-8').strip()
                 #print 'Derp', artist, title, artist_url, title_url
-                songs.add(Song(artist, title, artist_url, title_url, sid))
+                song = Song(artist, title, artist_url, title_url, sid)
+                songs.add(song)
+                id_dict[sid] = song
                 sid += 1
         songs = sorted(list(songs))
+        self._id_dict = id_dict
         self.artists = sorted(list(artists))
         self.songs = songs
         self.by_artist = self.songs
@@ -57,7 +61,7 @@ class SongList(object):
         return self[random.randint(0, len(self))]
 
     def __getitem__(self, key):
-        return self.songs[key]
+        return self._id_dict[key]
 
     def __len__(self):
         return len(self.songs)

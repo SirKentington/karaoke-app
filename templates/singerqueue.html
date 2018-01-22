@@ -10,12 +10,16 @@ table, th, td {
 <center>
 <a href="/queue/display">Queue</a><p>
 <table>
-<tr><th> Singer </th> <th> Song </th> <th> Remove </th>
+<tr><th> Singer </th>
+    <th> Artist </th>
+    <th> Song </th>
+    <th> Remove </th>
 
 {% for item in queue %}
-<tr><td> <a href="/queue/display?singer={{item.key}}"> {{item.key}} </a> </td>
-    <td> {{item.data}}  </td>
-    <td> <a href="/queue/remove?singer={{item.key}}&song={{item.data}}">X</a>  </td>
+<tr><td> <a href="/queue/display/{{item[0]}}"> {{item[0]}} </a> </td>
+    <td> <a href="/songs/search?artist={{item[1].artist_url}}">{{item[1].artist}}</a> </td>
+    <td> {{item[1].title}}  </td>
+    <td> <a href="/queue/remove/{{item[0]}}/{{item[1].sid}}">X</a>  </td>
 </tr>
 {% endfor %}
 

@@ -15,12 +15,16 @@ urlinfo = namedtuple('urlinfo', 'artist title artisturl titleurl')
 songlist = songs.SongList(sys.argv[1])
 queue = fairqueue.FairQueue()
 
-for singer in ['Kent', 'Lisa', 'Nels', 'Frosty']:
+# Add a series of random songs for testing the queue
+singers = ['Kent']#, 'Lisa', 'Nels', 'Frosty']
+for singer in singers:
     for i in range(5):
         song = songlist.random()
-        print song, song.title
-        queue.add(singer, song)
-        print queue
+        print 'Adding singer/song', singer, song.sid, song.title
+        queue.add(singer, song.sid)
+
+for item in queue[singer]:
+    print item.key, item.data
 
 # GENERIC STUFF
 def fmt(string):
@@ -67,52 +71,61 @@ def search():
         results = songlist.all_by_artist(artist)
     else:
         searchtext = fmt(request.args.get('query'))
-        print 'SEARCHED WITH QUERY', searchtext
+        print 'SEARCHED QUERY', searchtext
         results = songlist.search(searchtext.split())
     return search_box(searchtext) + render_template('songs.html', songlist=results)
 
 # QUEUE PART
+@app.route('/queue')
 @app.route('/queue/display')
-def queue_display(all_singers=False):
-    display_q = queue
-    tmp_queue = []
-    singer = None
-    if not all_singers:
-        singer = fmt(request.args.get('singer'))
-    if singer is not None:
-        display_q = queue[singer]
-    tmp_queue = [(item.key, item.data) for item in display_q]
-    print tmp_queue
-    return render_template('queue.html', queue=tmp_queue)
-
 @app.route('/queue/display/<singer>')
-def queue_singer(singer):
-    return render_template('singerqueue.html', queue=queue[singer])
+def queue_display(singer=None):
+    if singer:
+        print 'SINGER', singer
+        for item in queue[singer]:
+            print item.key, item.data
+        namequeue = [(item.key, songlist[item.data]) for item in queue[singer]]
+        print namequeue
+    else:
+        print 'NOSINGER', singer
+        for item in queue:
+            print item.key, item.data
+        namequeue = [(item.key, songlist[item.data]) for item in queue]
+    for thing in namequeue:
+        print thing[0], thing[1].title, thing[1].sid
+    if singer is not None:
+        return render_template('singerqueue.html', queue=namequeue)
+    return render_template('queue.html', queue=namequeue)
 
 def recreate_url(base, args):
     if len(args) == 0:
         return base
     return base + '?' + '&'.join(['%s=%s' % (v, args[v]) for v in args])
 
-@app.route('/queue/add')
-def queue_add():
-    name = request.cookies.get('karaoke_name')
-    if name is None:
-        return render_template('setname.html', desturl=recreate_url('/queue/add', request.args))
-    print 'NAME', name
-    singer = fmt(request.args.get('singer'))
-    song   = fmt(request.args.get('song'))
+@app.route('/queue/add/<singer>/<sid>')
+def queue_add(singer, sid):
+    try:
+        song = songlist[sid]
+    except IndexError:
+        pass
     if singer is None or song is None:
         return ''
-    queue.add(singer, song)
+    queue.add(singer, sid)
     return queue_display()
 
-@app.route('/queue/remove')
-def queue_remove():
-    singer = fmt(request.args.get('singer'))
-    song   = fmt(request.args.get('song'))
-    queue.remove(singer, song)
-    return queue_display(True)
+@app.route('/queue/remove/<singer>/<sid>')
+def queue_remove(singer=None, sid=None):
+    try:
+        sid = int(sid)
+    except ValueError:
+        return queue_display(singer=None)
+    for item in queue:
+        print item.key, item.data
+    print 'Gonna remove', singer, sid
+    for item in queue:
+        print item.key, item.data
+    queue.remove(singer, sid)
+    return queue_display(singer=None)
 
 if __name__ == '__main__':
     app.run(host="0.0.0.0", port=8080, debug=True)

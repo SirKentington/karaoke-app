@@ -15,7 +15,7 @@ table, th, td {
     <th> Artist </th>
     <th> Song </th>
 {% for item in queue %}
-<tr><td> <a href="/queue/display/{{item.key}}"> {{item[0]}} </a> </td>
+<tr><td> <a href="/queue/display/{{item[0]}}"> {{item[0]}} </a> </td>
     <td> <a href="/songs/search?artist={{item[1].artist_url}}">{{item[1].artist}}</a> </td>
     <td> {{item[1].title}} </td>
 </tr>

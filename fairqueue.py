@@ -52,8 +52,9 @@ class FairQueue(object):
         self.queue.append(Data(key, data))
 
     def remove(self, key, data):
-        for n, elem in enumerate(self.queue[:]):
+        for elem in self.queue[:]:
             if elem.key == key and elem.data == data:
+                print 'Found removal for', key, data
                 elem.data = None
                 return
 
