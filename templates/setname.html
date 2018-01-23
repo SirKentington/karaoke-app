@@ -5,12 +5,12 @@
 <a style="text-align:center" href=/songs/title>All Songs by Title</a><p>
 </center>
 
-<center> Please enter your singer name </center>
+<center> By which name would you like to be known? </center>
 
 <div id="tfheader" style="text-align:center">
-    <form action="/songs/search" id="tfnewsearch" method="get">
-        <input type="text" class="tftextinput" id="tfnewsearch" name="query" size="21" maxlength="120" value="{{ searchtext }}">
-        <input type="submit" value="Search" class="tfbutton">
+    <form action="/queue/setname" id="tfnewsinger" method="put">
+        <input type="text" class="tftextinput" id="tfnewsinger" name="singer" size="21" maxlength="120">
+        <input type="submit" value="Enter" class="tfbutton">
     </form>
 <div class="tfclear"></div>
 </div>

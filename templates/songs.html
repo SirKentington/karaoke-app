@@ -15,7 +15,7 @@ table, th, td {
     <td> {{song.title}}  </td>
     <td>
         {% if name != '' %}
-            <a href="/queue/add/{{name}}/{{song.sid}}">+</a>
+            <a href="/queue/add/{{name}}/{{song.sid}}">Add to Queue</a>
         {% endif %}
 {% endfor %}
     </td>

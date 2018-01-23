@@ -87,14 +87,13 @@ def search():
 @app.route('/queue/display/<singer>')
 def queue_display(singer=None):
     name = singer_name()
-#    if not name:
-#        desturl = request.script_root + request.path
-#        return render_template('setname.html', desturl=desturl)
     if singer:
+        header = '%s\'s Queue' % singer
         namequeue = [(item.key, songlist[item.data]) for item in queue[singer]]
-        return render_template('singerqueue.html', queue=namequeue, name=name)
-    namequeue = [(item.key, songlist[item.data]) for item in queue]
-    return render_template('queue.html', queue=namequeue, name=name)
+    else:
+        header = 'All Singers Queue'
+        namequeue = [(item.key, songlist[item.data]) for item in queue]
+    return render_template('queue.html', queue=namequeue, name=name, header=header)
 
 @app.route('/queue/add/<singer>/<sid>')
 def queue_add(sid, singer=None):
@@ -113,13 +112,14 @@ def queue_remove(singer=None, sid=None):
     queue.remove(singer, int(sid))
     return queue_display(singer=None)
 
-@app.route('/queue/setname/<singer>')
-def set_singer_name(singer=None):
-    if singer:
-        resp = make_response(redirect('/songs'))
-        resp.set_cookie(singer_cookie_name, singer)
-        return resp
-    return search_box()
+@app.route('/queue/setname')
+def set_singer_name():
+    singer = fmt(request.args.get('singer'))
+    if not singer:
+        return render_template('setname.html')
+    resp = make_response(redirect('/songs'))
+    resp.set_cookie(singer_cookie_name, singer)
+    return resp
 
 if __name__ == '__main__':
     app.run(host="0.0.0.0", port=8080, debug=True)
