@@ -16,7 +16,7 @@ songlist = songs.SongList(sys.argv[1])
 queue = fairqueue.FairQueue()
 
 # Add a series of random songs for testing the queue
-singers = ['Kent']#, 'Lisa', 'Nels', 'Frosty']
+singers = ['Kent', 'Lisa', 'Nels', 'Frosty']
 for singer in singers:
     for i in range(5):
         song = songlist.random()
@@ -46,16 +46,22 @@ def header_image():
 def icon():
     return ''
 
-# SONGS PART
+####################
+# Displaying Songs #
+####################
 @app.route('/')
 @app.route('/songs')
 def root():
     return search_box('')
 
-@app.route('/songs/artist')
-def by_artist():
+@app.route('/songs/artist/<aid>')
+def by_artist(aid=None):
+    if aid:
+        results = songlist.all_by_artist(int(aid))
+    else:
+        results = songlist.by_artist
     return search_box('') + '<center>SONGS BY ARTIST</center><p>' + \
-                    render_template('songs.html', songlist=songlist.by_artist)
+                    render_template('songs.html', songlist=results)
 
 @app.route('/songs/title')
 def by_title():
@@ -64,18 +70,14 @@ def by_title():
 
 @app.route('/songs/search')
 def search():
-    searchtext = ''
-    artist = fmt(request.args.get('artist'))
-    if artist is not None:
-        searchtext = artist
-        results = songlist.all_by_artist(artist)
-    else:
-        searchtext = fmt(request.args.get('query'))
-        print 'SEARCHED QUERY', searchtext
-        results = songlist.search(searchtext.split())
+    searchtext = fmt(request.args.get('query'))
+    print 'SEARCHED QUERY', searchtext
+    results = songlist.search(searchtext.split())
     return search_box(searchtext) + render_template('songs.html', songlist=results)
 
-# QUEUE PART
+####################
+# Displaying Queue #
+####################
 @app.route('/queue')
 @app.route('/queue/display')
 @app.route('/queue/display/<singer>')
@@ -102,8 +104,8 @@ def recreate_url(base, args):
         return base
     return base + '?' + '&'.join(['%s=%s' % (v, args[v]) for v in args])
 
-@app.route('/queue/add/<singer>/<sid>')
-def queue_add(singer, sid):
+@app.route('/queue/add/<sid>/<singer>')
+def queue_add(sid, singer=None):
     try:
         song = songlist[sid]
     except IndexError:
@@ -113,18 +115,9 @@ def queue_add(singer, sid):
     queue.add(singer, sid)
     return queue_display()
 
-@app.route('/queue/remove/<singer>/<sid>')
+@app.route('/queue/remove/<sid>/<singer>')
 def queue_remove(singer=None, sid=None):
-    try:
-        sid = int(sid)
-    except ValueError:
-        return queue_display(singer=None)
-    for item in queue:
-        print item.key, item.data
-    print 'Gonna remove', singer, sid
-    for item in queue:
-        print item.key, item.data
-    queue.remove(singer, sid)
+    queue.remove(singer, int(sid))
     return queue_display(singer=None)
 
 if __name__ == '__main__':

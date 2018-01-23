@@ -11,12 +11,14 @@ table, th, td {
 
 <a href="/songs">Song List</a><p>
 <table>
-<tr><th> Singer </th>
+<tr><th> Spot </th>
+    <th> Singer </th>
     <th> Artist </th>
     <th> Song </th>
 {% for item in queue %}
-<tr><td> <a href="/queue/display/{{item[0]}}"> {{item[0]}} </a> </td>
-    <td> <a href="/songs/search?artist={{item[1].artist_url}}">{{item[1].artist}}</a> </td>
+<tr><td>  {{loop.index}} </td>
+    <td> <a href="/queue/display/{{item[0]}}"> {{item[0]}} </a> </td>
+    <td> <a href="/songs/artist/{{item[1].aid}}">{{item[1].artist}}</a> </td>
     <td> {{item[1].title}} </td>
 </tr>
 {% endfor %}

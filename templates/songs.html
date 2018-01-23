@@ -11,7 +11,7 @@ table, th, td {
 <table>
 <tr><th> Artist </th> <th> Title </th>
 {% for song in songlist %}
-<tr><td> <a href="/songs/search?artist={{song.artist_url}}">{{song.artist}}</a> </td>
+<tr><td> <a href="/songs/artist/{{song.aid}}">{{song.artist}}</a> </td>
     <td> {{song.title}}  </td></tr>
 {% endfor %}
 

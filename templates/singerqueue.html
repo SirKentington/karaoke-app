@@ -17,9 +17,9 @@ table, th, td {
 
 {% for item in queue %}
 <tr><td> <a href="/queue/display/{{item[0]}}"> {{item[0]}} </a> </td>
-    <td> <a href="/songs/search?artist={{item[1].artist_url}}">{{item[1].artist}}</a> </td>
+    <td> <a href="/songs/artist/{{item[1].aid}}">{{item[1].artist}}</a> </td>
     <td> {{item[1].title}}  </td>
-    <td> <a href="/queue/remove/{{item[0]}}/{{item[1].sid}}">X</a>  </td>
+    <td> <a href="/queue/remove/{{item[1].sid}}/{{item[0]}}">X</a>  </td>
 </tr>
 {% endfor %}
 
