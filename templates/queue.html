@@ -10,16 +10,24 @@ table, th, td {
 <center>
 
 <a href="/songs">Song List</a><p>
+Singer: {{name}} <a href="/do/thing">(Not you?)</a><p>
 <table>
 <tr><th> Spot </th>
     <th> Singer </th>
     <th> Artist </th>
     <th> Song </th>
+    <th> Remove </th>
 {% for item in queue %}
 <tr><td>  {{loop.index}} </td>
     <td> <a href="/queue/display/{{item[0]}}"> {{item[0]}} </a> </td>
     <td> <a href="/songs/artist/{{item[1].aid}}">{{item[1].artist}}</a> </td>
     <td> {{item[1].title}} </td>
+    <td>
+        {% if name == item[0] %}
+            <center><a href="/queue/remove/{{item[0]}}/{{item[1].sid}}">Remove</a></center>
+        {% endif %}
+
+    </td>
 </tr>
 {% endfor %}
 

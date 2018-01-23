@@ -5,38 +5,32 @@ import sys
 import songs
 import fairqueue
 import urllib
-from collections import namedtuple
 
-from flask import Flask, render_template, request
+from flask import Flask, render_template, request, redirect, make_response
 app = Flask(__name__, static_url_path='/static')
-
-urlinfo = namedtuple('urlinfo', 'artist title artisturl titleurl')
 
 songlist = songs.SongList(sys.argv[1])
 queue = fairqueue.FairQueue()
+
+singer_cookie_name = 'kent_karaoke.singer_name'
 
 # Add a series of random songs for testing the queue
 singers = ['Kent', 'Lisa', 'Nels', 'Frosty']
 for singer in singers:
     for i in range(5):
-        song = songlist.random()
-        print 'Adding singer/song', singer, song.sid, song.title
-        queue.add(singer, song.sid)
+        queue.add(singer, songlist.random().sid)
 
-for item in queue[singer]:
-    print item.key, item.data
-
-# GENERIC STUFF
+#####################
+# Generic functions #
+#####################
 def fmt(string):
     if string is None:
         return None
     return urllib.unquote(string.decode('utf-8').strip())
 
-def to_url(string):
-    return urllib.quote(string.decode('utf-8'))
-
-def search_box(text=''):
-    return render_template('searchbox.html', searchtext=text)
+def search_box(text='', name=''):
+    name = singer_name()
+    return render_template('searchbox.html', searchtext=text, name=name)
 
 @app.route('/batman')
 def header_image():
@@ -46,79 +40,86 @@ def header_image():
 def icon():
     return ''
 
+def singer_name():
+    name = request.cookies.get(singer_cookie_name)
+    if not name:
+        return ''
+    return name
+
 ####################
 # Displaying Songs #
 ####################
 @app.route('/')
 @app.route('/songs')
 def root():
-    return search_box('')
+    name = singer_name()
+    return search_box('', name=name)
 
 @app.route('/songs/artist/<aid>')
 def by_artist(aid=None):
+    name = singer_name()
     if aid:
         results = songlist.all_by_artist(int(aid))
     else:
         results = songlist.by_artist
     return search_box('') + '<center>SONGS BY ARTIST</center><p>' + \
-                    render_template('songs.html', songlist=results)
+                    render_template('songs.html', songlist=results, name=name)
 
 @app.route('/songs/title')
 def by_title():
+    name = singer_name()
     return search_box('') + '<center>SONGS BY TITLE</center><p>' + \
-                    render_template('songs.html', songlist=songlist.by_title)
+                    render_template('songs.html', songlist=songlist.by_title, name=name)
 
 @app.route('/songs/search')
 def search():
+    name = singer_name()
     searchtext = fmt(request.args.get('query'))
     print 'SEARCHED QUERY', searchtext
     results = songlist.search(searchtext.split())
-    return search_box(searchtext) + render_template('songs.html', songlist=results)
+    return search_box(searchtext) + render_template('songs.html', songlist=results, name=name)
 
 ####################
 # Displaying Queue #
 ####################
-@app.route('/queue')
+@app.route('/queue/')
 @app.route('/queue/display')
 @app.route('/queue/display/<singer>')
 def queue_display(singer=None):
+    name = singer_name()
+#    if not name:
+#        desturl = request.script_root + request.path
+#        return render_template('setname.html', desturl=desturl)
     if singer:
-        print 'SINGER', singer
-        for item in queue[singer]:
-            print item.key, item.data
         namequeue = [(item.key, songlist[item.data]) for item in queue[singer]]
-        print namequeue
-    else:
-        print 'NOSINGER', singer
-        for item in queue:
-            print item.key, item.data
-        namequeue = [(item.key, songlist[item.data]) for item in queue]
-    for thing in namequeue:
-        print thing[0], thing[1].title, thing[1].sid
-    if singer is not None:
-        return render_template('singerqueue.html', queue=namequeue)
-    return render_template('queue.html', queue=namequeue)
+        return render_template('singerqueue.html', queue=namequeue, name=name)
+    namequeue = [(item.key, songlist[item.data]) for item in queue]
+    return render_template('queue.html', queue=namequeue, name=name)
 
-def recreate_url(base, args):
-    if len(args) == 0:
-        return base
-    return base + '?' + '&'.join(['%s=%s' % (v, args[v]) for v in args])
-
-@app.route('/queue/add/<sid>/<singer>')
+@app.route('/queue/add/<singer>/<sid>')
 def queue_add(sid, singer=None):
+    sid = int(sid)
     try:
         song = songlist[sid]
     except IndexError:
         pass
-    if singer is None or song is None:
+    if singer is None or sid >= len(songlist):
         return ''
     queue.add(singer, sid)
     return queue_display()
 
-@app.route('/queue/remove/<sid>/<singer>')
+@app.route('/queue/remove/<singer>/<sid>')
 def queue_remove(singer=None, sid=None):
     queue.remove(singer, int(sid))
     return queue_display(singer=None)
+
+@app.route('/queue/setname/<singer>')
+def set_singer_name(singer=None):
+    if singer:
+        resp = make_response(redirect('/songs'))
+        resp.set_cookie(singer_cookie_name, singer)
+        return resp
+    return search_box()
 
 if __name__ == '__main__':
     app.run(host="0.0.0.0", port=8080, debug=True)

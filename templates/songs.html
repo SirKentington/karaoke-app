@@ -9,11 +9,16 @@ table, th, td {
 
 <center>
 <table>
-<tr><th> Artist </th> <th> Title </th>
+<tr><th> Artist </th> <th> Title </th> <th></th>
 {% for song in songlist %}
 <tr><td> <a href="/songs/artist/{{song.aid}}">{{song.artist}}</a> </td>
-    <td> {{song.title}}  </td></tr>
+    <td> {{song.title}}  </td>
+    <td>
+        {% if name != '' %}
+            <a href="/queue/add/{{name}}/{{song.sid}}">+</a>
+        {% endif %}
 {% endfor %}
-
+    </td>
+</tr>
 </table>
 </center>

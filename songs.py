@@ -21,7 +21,7 @@ class SongList(object):
 
     def __init__(self, filename):
         print 'Reading in songlist'
-        sid = 0
+        tmp_songlist = []
         aid = 0
         aid_inc = Incrementor()
         artist = ''
@@ -30,26 +30,30 @@ class SongList(object):
         sid_dict = {}
         aid_dict = defaultdict(list)
         artist_to_aid = {}
+        # Read in every artist/title pair
         with open(filename, 'r') as f:
             for line in f.readlines():
                 if line.isspace():
                     continue
                 (artist, title) = [x.decode('utf-8').strip() for x in line.split('#', 1)]
-                if artist not in artist_to_aid:
-                    artist_to_aid[artist] = aid_inc.inc()
-                aid = artist_to_aid[artist]
-                song = Song(artist, title, aid, sid)
-                songs.add(song)
-                aid_dict[aid].append(song)
-                sid_dict[sid] = song
-                sid += 1
+                tmp_songlist.append((artist, title))
+        # Filter out dups and sort by title
+        tmp_songlist = sorted(list(set(tmp_songlist)), key=lambda x: x[1])
+        for sid, (artist, title) in enumerate(tmp_songlist):
+            if artist not in artist_to_aid:
+                artist_to_aid[artist] = aid_inc.inc()
+            aid = artist_to_aid[artist]
+            song = Song(artist, title, aid, sid)
+            songs.add(song)
+            aid_dict[aid].append(song)
+            sid_dict[sid] = song
         songs = sorted(list(songs))
         self._aid_dict = aid_dict
         self._sid_dict = sid_dict
         self.artists = sorted(list(artist_to_aid.keys()))
         self.songs = songs
-        self.by_artist = self.songs
-        self.by_title = sorted(self.songs, key=lambda x: x[1])
+        self.by_title = songs
+        self.by_artist = sorted(self.songs)
         print 'Finished reading in songlist'
 
     def search(self, queries):
@@ -62,8 +66,10 @@ class SongList(object):
         results_list.sort()
         return results_list
 
-    def all_by_artist(self, artist_id):
-        return sorted(self._aid_dict[artist_id])
+    def all_by_artist(self, aid=None):
+        if aid:
+            return sorted(self._aid_dict[aid])
+        return self.by_artist
 
     def aid_to_artist(self, artist_id):
         return self._aid_dict[artist_id][0].artist
