@@ -132,6 +132,11 @@ def set_singer_name():
     resp.set_cookie(singer_cookie_name, singer)
     return resp
 
+# Infinite scrolling tests
+@app.route('/infscroll')
+def inf_scroll():
+    return render_template('infscroll.html')
+
 if __name__ == '__main__':
     app.run(host="0.0.0.0", port=8080, debug=True)
 
