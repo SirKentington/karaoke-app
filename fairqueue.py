@@ -58,6 +58,28 @@ class FairQueue(object):
                 elem.data = None
                 return
 
+    def moveup(self, key, data):
+        last = None
+        for item in self.queue:
+            if item.key == key:
+                if item.data == data:
+                    if last is None:
+                        return
+                    item.data = last.data
+                    last.data = data
+                else:
+                    last = item
+
+    def movedown(self, key, data):
+        last = None
+        for item in self.queue:
+            if item.key == key and item.data == data:
+                last = item
+            elif item.key == key and last is not None:
+                last.data = item.data
+                item.data = data
+                return
+
     def addlist(self, key, datalist):
         for data in datalist:
             self.add(key, data)

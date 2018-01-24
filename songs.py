@@ -26,7 +26,7 @@ class SongList(object):
         aid_inc = Incrementor()
         artist = ''
         title = ''
-        songs = set()
+        songs = []
         sid_dict = {}
         aid_dict = defaultdict(list)
         artist_to_aid = {}
@@ -36,6 +36,7 @@ class SongList(object):
                 if line.isspace():
                     continue
                 (artist, title) = [x.decode('utf-8').strip() for x in line.split('#', 1)]
+                artist = artist[:30]
                 tmp_songlist.append((artist, title))
         # Filter out dups and sort by title
         tmp_songlist = sorted(list(set(tmp_songlist)), key=lambda x: x[1])
@@ -44,10 +45,9 @@ class SongList(object):
                 artist_to_aid[artist] = aid_inc.inc()
             aid = artist_to_aid[artist]
             song = Song(artist, title, aid, sid)
-            songs.add(song)
+            songs.append(song)
             aid_dict[aid].append(song)
             sid_dict[sid] = song
-        songs = sorted(list(songs))
         self._aid_dict = aid_dict
         self._sid_dict = sid_dict
         self.artists = sorted(list(artist_to_aid.keys()))

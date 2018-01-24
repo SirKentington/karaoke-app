@@ -1,19 +1,15 @@
-<style>
-table, th, td {
-    border: 1px solid black;
-    border-collapse: collapse;
-    padding-right: 5px;
-    padding-left: 5px;
-}
-</style>
+<link rel="stylesheet" type="text/css" href="/static/style.css" />
+<head>
+<title>Karaoke!</title>
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+</head>
 
 <center>
-
-<a href="/songs">Song List</a><p>
-<a href="/queue">Queue</a><p>
-Singer: {{name}} <a href="/queue/setname">(Not you?)</a><p>
-<big><bold>{{header}}</bold></big><p>
-<table>
+<a href="/songs">Song List</a><br>
+<a href="/queue">Queue</a><br>
+Singer: {{name}} <a href="/queue/setname">(Not you?)</a><br>
+<big><bold>{{header}}</bold></big><br>
+<table id="queue">
 <tr><th> Spot </th>
     <th> Singer </th>
     <th> Artist </th>

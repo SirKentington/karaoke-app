@@ -55,6 +55,7 @@ def root():
     name = singer_name()
     return search_box('', name=name)
 
+@app.route('/songs/artist/')
 @app.route('/songs/artist/<aid>')
 def by_artist(aid=None):
     name = singer_name()
@@ -65,7 +66,7 @@ def by_artist(aid=None):
     return search_box('') + '<center>SONGS BY ARTIST</center><p>' + \
                     render_template('songs.html', songlist=results, name=name)
 
-@app.route('/songs/title')
+@app.route('/songs/title/')
 def by_title():
     name = singer_name()
     return search_box('') + '<center>SONGS BY TITLE</center><p>' + \
@@ -83,7 +84,7 @@ def search():
 # Displaying Queue #
 ####################
 @app.route('/queue/')
-@app.route('/queue/display')
+@app.route('/queue/display/')
 @app.route('/queue/display/<singer>')
 def queue_display(singer=None):
     name = singer_name()
@@ -110,6 +111,16 @@ def queue_add(sid, singer=None):
 @app.route('/queue/remove/<singer>/<sid>')
 def queue_remove(singer=None, sid=None):
     queue.remove(singer, int(sid))
+    return queue_display(singer=None)
+
+@app.route('/queue/moveup/<singer>/<sid>')
+def queue_move_up(singer=None, sid=None):
+    queue.moveup(singer, int(sid))
+    return queue_display(singer=None)
+
+@app.route('/queue/movedown/<singer>/<sid>')
+def queue_move_down(singer=None, sid=None):
+    queue.movedown(singer, int(sid))
     return queue_display(singer=None)
 
 @app.route('/queue/setname')

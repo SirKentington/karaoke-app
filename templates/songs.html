@@ -1,21 +1,16 @@
-<style>
-table, th, td {
-    border: 1px solid black;
-    border-collapse: collapse;
-    padding-right: 5px;
-    padding-left: 5px;
-}
-</style>
+<link rel="stylesheet" type="text/css" href="/static/style.css" />
 
 <center>
-<table>
+<table id="songs">
 <tr><th> Artist </th> <th> Title </th> <th></th>
 {% for song in songlist %}
 <tr><td> <a href="/songs/artist/{{song.aid}}">{{song.artist}}</a> </td>
     <td> {{song.title}}  </td>
     <td>
         {% if name != '' %}
-            <a href="/queue/add/{{name}}/{{song.sid}}">Add to Queue</a>
+            <form action="/queue/add/{{name}}/{{song.sid}}">
+                <input type="submit" value="Queue" />
+            </form>
         {% endif %}
 {% endfor %}
     </td>
