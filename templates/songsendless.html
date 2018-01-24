@@ -1,0 +1,19 @@
+<link rel="stylesheet" type="text/css" href="/static/style.css" />
+
+<center>
+<table id="songs">
+<tr><th> Artist </th> <th> Title </th> <th></th>
+{% for song in songlist %}
+<tr><td> <a href="/songs/artist/{{song.aid}}">{{song.artist}}</a> </td>
+    <td> {{song.title}}  </td>
+    <td>
+        {% if name != '' %}
+            <form action="/queue/add/{{name}}/{{song.sid}}">
+                <input type="submit" value="Queue" />
+            </form>
+        {% endif %}
+{% endfor %}
+    </td>
+</tr>
+</table>
+</center>

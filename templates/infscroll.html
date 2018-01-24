@@ -1,0 +1,73 @@
+<link rel="stylesheet" type="text/css" href="/static/style.css" />
+
+<style>
+dy {
+	margin: 0;
+	background-color: #F0F0F0;
+	font-family: 'Liberation Sans', Arial, sans-serif;
+}
+
+h1 {
+	text-align: center;
+}
+
+#numbers {
+	margin: 2em auto;
+	padding: 0;
+	width: 15em;
+	height: 10em;
+	overflow: auto;
+	text-align: center;
+	list-style-type: none;
+}
+</style>
+
+<h1>Infinite Scrolling, Demo 4</h1>
+
+		<ul id="numbers">
+			<li>1</li>
+			<li>2</li>
+			<li>3</li>
+			<li>4</li>
+			<li>5</li>
+			<li>6</li>
+			<li>7</li>
+			<li>8</li>
+			<li>9</li>
+			<li>10</li>
+			<li>11</li>
+			<li>12</li>
+			<li>13</li>
+			<li>14</li>
+			<li>15</li>
+			<li>16</li>
+			<li>17</li>
+			<li>18</li>
+			<li>19</li>
+			<li>20</li>
+               </ul>
+
+<script src="https://code.jquery.com/jquery-2.0.0.min.js"></script>
+<script src="/static/endless_scroll.js"></script>
+
+<script>
+$(document).ready(function() {
+	var offset = $('#numbers li').length;
+
+        var last = $('#numbers li').last
+        console.log(offset, last)
+
+	$('#numbers').endlessScroll({
+		fireOnce: false,
+		fireDelay: false,
+		loader: '',
+		insertAfter: '#numbers li:last',
+		content: function(i) {
+                        var newstuff = '<li>' + (i + offset) + '</li>';
+                        console.log(newstuff)
+                        return newstuff
+		}
+	});
+});
+</script>
+
