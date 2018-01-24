@@ -55,6 +55,10 @@ def root():
     name = singer_name()
     return search_box('', name=name)
 
+@app.route('/songs/title/endless')
+def songs_endless():
+    return render_template('songsendless.html')
+
 @app.route('/songs/artist/')
 @app.route('/songs/artist/<aid>')
 def by_artist(aid=None):
@@ -71,6 +75,11 @@ def by_title():
     name = singer_name()
     return search_box('') + '<center>SONGS BY TITLE</center><p>' + \
                     render_template('songs.html', songlist=songlist.by_title, name=name)
+
+@app.route('/songs/title/<start>/<end>/')
+def title_start_end(start=0, end=1):
+    slist = songlist.songs[int(start):int(end)]
+    return render_template('songtable.html', songlist=slist)
 
 @app.route('/songs/search')
 def search():

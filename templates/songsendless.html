@@ -1,19 +1,53 @@
 <link rel="stylesheet" type="text/css" href="/static/style.css" />
 
+</style>
+<script src="https://code.jquery.com/jquery-2.0.0.min.js"></script>
+<script src="/static/endless_scroll.js"></script>
+
 <center>
 <table id="songs">
-<tr><th> Artist </th> <th> Title </th> <th></th>
-{% for song in songlist %}
-<tr><td> <a href="/songs/artist/{{song.aid}}">{{song.artist}}</a> </td>
-    <td> {{song.title}}  </td>
-    <td>
-        {% if name != '' %}
-            <form action="/queue/add/{{name}}/{{song.sid}}">
-                <input type="submit" value="Queue" />
-            </form>
-        {% endif %}
-{% endfor %}
-    </td>
-</tr>
+<tr><th> Artist </th> <th> Title </th> <th></th></tr>
 </table>
 </center>
+
+<script>
+$(document).ready(function() {
+        var chunk = 100
+        var offset = 0;
+
+        function success(resp) {
+            $('#songs tr:last').after(resp)
+        }
+
+        console.log(offset, chunk)
+
+        qurl = '/songs/title/' + offset + '/' + (offset + chunk) + '/'
+        jQuery.get(qurl, '', success)
+
+        $('#songs').endlessScroll({
+                fireOnce: true,
+                fireDelay: false,
+                loader: '',
+                insertAfter: '#songs tr:last',
+                content: function(i) {
+                        console.log('FIRING')
+                        var qurl = '/songs/title/' + offset + '/' + (offset + chunk) + '/'
+                        jQuery.get(qurl, '', success)
+                        offset = offset + chunk
+                        return ''
+                }
+        });
+
+    function chk_scroll(e) {
+        console.log('chk_scroll called')
+        var elem = $(e.currentTarget);
+        if (elem[0].scrollHeight - elem.scrollTop() == elem.outerHeight()) {
+            console.log("bottom");
+        }
+    }
+
+    $('div').bind('scroll',chk_scroll);
+
+});
+</script>
+
