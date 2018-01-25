@@ -5,6 +5,7 @@ import sys
 import songs
 import fairqueue
 import urllib
+from cachedict import CacheDict
 
 from flask import Flask, render_template, request, redirect, make_response
 app = Flask(__name__, static_url_path='/static')
@@ -19,25 +20,6 @@ singers = ['Kent', 'Lisa', 'Nels', 'Frosty']
 for singer in singers:
     for i in range(5):
         queue.add(singer, songlist.random().sid)
-
-class CacheDict(object):
-    def __init__(self, size=512):
-        self._dict = {}
-        self._lru_list = []
-        self._max_cache = size
-
-    def __contains__(self, key):
-        return key in self._dict
-
-    def __getitem__(self, key):
-        return self._dict[key]
-
-    def __setitem__(self, key, val):
-        self._dict[key] = val
-        self._lru_list.append(key)
-        if len(self._lru_list) >= self._max_cache:
-            oldkey = self._lru_list.pop(0)
-            del self._dict[oldkey]
 
 search_cache = CacheDict()
 
