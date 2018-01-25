@@ -20,6 +20,27 @@ for singer in singers:
     for i in range(5):
         queue.add(singer, songlist.random().sid)
 
+class CacheDict(object):
+    def __init__(self, size=512):
+        self._dict = {}
+        self._lru_list = []
+        self._max_cache = size
+
+    def __contains__(self, key):
+        return key in self._dict
+
+    def __getitem__(self, key):
+        return self._dict[key]
+
+    def __setitem__(self, key, val):
+        self._dict[key] = val
+        self._lru_list.append(key)
+        if len(self._lru_list) >= self._max_cache:
+            oldkey = self._lru_list.pop(0)
+            del self._dict[oldkey]
+
+search_cache = CacheDict()
+
 #####################
 # Generic functions #
 #####################
@@ -90,8 +111,27 @@ def search():
     name = singer_name()
     searchtext = fmt(request.args.get('query'))
     print 'SEARCHED QUERY', searchtext
-    results = songlist.search(searchtext.split())
+    if searchtext in search_cache:
+        print 'Cache hit on', searchtext
+        results = search_cache[searchtext]
+    else:
+        print 'Cache miss on', searchtext
+        results = songlist.search(searchtext.split())
+        search_cache[searchtext] = results
     return search_box(searchtext) + render_template('songs.html', songlist=results, name=name)
+
+
+@app.route('/artists/')
+def artists():
+    name = singer_name()
+    return search_box('') + render_template('artists.html', name=name)
+
+@app.route('/artists/<start>/<end>')
+def artists_list(start=0, end=1):
+    name = singer_name()
+    artistlist = songlist.artists[int(start): int(end)]
+    return render_template('artistslist.html', artistlist=artistlist, name=name)
+
 
 ####################
 # Displaying Queue #

@@ -8,6 +8,7 @@ import urllib
 
 #Song = namedtuple('Song', 'artist title artist_url title_url sid')
 Song = namedtuple('Song', 'artist title aid sid')
+Artist = namedtuple('Artist', 'artist aid')
 
 class Incrementor(object):
     def __init__(self):
@@ -48,9 +49,10 @@ class SongList(object):
             songs.append(song)
             aid_dict[aid].append(song)
             sid_dict[sid] = song
+        self.artist_to_aid = artist_to_aid
         self._aid_dict = aid_dict
         self._sid_dict = sid_dict
-        self.artists = sorted(list(artist_to_aid.keys()))
+        self.artists = sorted([Artist(key, val) for key, val in self.artist_to_aid.items()])
         self.songs = songs
         self.by_title = songs
         self.by_artist = sorted(self.songs)
@@ -73,9 +75,6 @@ class SongList(object):
 
     def aid_to_artist(self, artist_id):
         return self._aid_dict[artist_id][0].artist
-
-    def artists(self):
-        return self.artists
 
     def random(self):
         return self[random.randint(0, len(self))]
