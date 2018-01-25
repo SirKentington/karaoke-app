@@ -7,15 +7,15 @@
 <center>
 <!--img src=/static/batman.jpg style="width:300px"!--><p>
 You are {{name}} <a href="/queue/setname">(Change?)</a><br>
-<a style="text-align:center" href="/queue/display/">Queue</a><br>
-<a style="text-align:center" href="/songs/artist/">All Songs by Artist</a><br>
-<a style="text-align:center" href="/songs/title/">All Songs by Title</a><br>
+<a style="text-align:center" href="/queue/display/">Singer Queue</a><br>
+List Songs by <a style="text-align:center" href="/songs/artist/">Artist</a>
+or <a style="text-align:center" href="/songs/title/">Title</a><br>
 </center>
 
 <div id="tfheader" style="text-align:center">
     <form action="/songs/search" id="tfnewsearch" method="get">
         <input type="text" class="tftextinput" id="tfnewsearch" name="query" size="21" maxlength="120" value="{{ searchtext }}">
-        <input type="submit" value="Search" class="tfbutton">
+        <input type="submit" value="Search Songs" class="tfbutton">
     </form>
 <div class="tfclear"></div>
 </div>

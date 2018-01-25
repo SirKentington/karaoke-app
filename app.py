@@ -51,15 +51,11 @@ def singer_name():
 ####################
 @app.route('/')
 @app.route('/songs')
+@app.route('/songs/artist/')
 def root():
     name = singer_name()
-    return search_box('', name=name)
+    return search_box('') + render_template('artistsendless.html', songlist=songlist.by_artist, name=name)
 
-@app.route('/songs/title/endless')
-def songs_endless():
-    return render_template('songsendless.html')
-
-@app.route('/songs/artist/')
 @app.route('/songs/artist/<aid>')
 def by_artist(aid=None):
     name = singer_name()
@@ -67,19 +63,27 @@ def by_artist(aid=None):
         results = songlist.all_by_artist(int(aid))
     else:
         results = songlist.by_artist
-    return search_box('') + '<center>SONGS BY ARTIST</center><p>' + \
-                    render_template('songs.html', songlist=results, name=name)
+    return search_box('') + render_template('songs.html', songlist=results, name=name)
 
 @app.route('/songs/title/')
 def by_title():
     name = singer_name()
     return search_box('') + '<center>SONGS BY TITLE</center><p>' + \
-                    render_template('songs.html', songlist=songlist.by_title, name=name)
+                    render_template('songsendless.html', name=name)
 
 @app.route('/songs/title/<start>/<end>/')
 def title_start_end(start=0, end=1):
+    name = fmt(request.args.get('name'))
+    print 'GOT NAME', name
     slist = songlist.songs[int(start):int(end)]
-    return render_template('songtable.html', songlist=slist)
+    return render_template('songtable.html', songlist=slist, name=name)
+
+@app.route('/songs/artist/<start>/<end>/')
+def artist_start_end(start=0, end=1):
+    name = fmt(request.args.get('name'))
+    print 'GOT NAME', name
+    slist = songlist.by_artist[int(start):int(end)]
+    return render_template('songtable.html', songlist=slist, name=name)
 
 @app.route('/songs/search')
 def search():
@@ -112,7 +116,7 @@ def queue_add(sid, singer=None):
         song = songlist[sid]
     except IndexError:
         pass
-    if singer is None or sid >= len(songlist):
+    if singer is None or singer == 'None' or sid >= len(songlist):
         return ''
     queue.add(singer, sid)
     return queue_display()
@@ -140,11 +144,6 @@ def set_singer_name():
     resp = make_response(redirect('/songs'))
     resp.set_cookie(singer_cookie_name, singer)
     return resp
-
-# Infinite scrolling tests
-@app.route('/infscroll')
-def inf_scroll():
-    return render_template('infscroll.html')
 
 if __name__ == '__main__':
     app.run(host="0.0.0.0", port=8080, debug=True)

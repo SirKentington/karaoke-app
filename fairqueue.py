@@ -30,6 +30,9 @@ class FairQueue(object):
         if data is None:
             raise ValueError
 
+        if (key, data) in self:
+            return
+
         # See if a placeholder exists
         for n, elem in enumerate(self.queue[:]):
             if elem.key == key and elem.data is None:
@@ -115,6 +118,12 @@ class FairQueue(object):
             if item.data is None:
                 continue
             yield item
+
+    def __contains__(self, keytuple):
+        for item in self.queue:
+            if item.key == keytuple[0] and item.data == keytuple[1]:
+                return True
+        return False
 
     def __repr__(self):
         return repr(self.queue)

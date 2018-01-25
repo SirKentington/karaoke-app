@@ -18,13 +18,10 @@ Singer: {{name}} <a href="/queue/setname">(Not you?)</a><br>
     <th> &uarr; </th>
     <th> &darr; </th>
 {% for item in queue %}
-<tr
+<tr>
 {% if name == item[0] %}
-bgcolor=#ccff99
-{% else %}
-bgcolor=#FFFFFF
+<strong>
 {% endif %}
->
 <td>  {{loop.index}} </td>
 <td> <a href="/queue/display/{{item[0]}}"> {{item[0]}} </a> </td>
 <td> <a href="/songs/artist/{{item[1].aid}}">{{item[1].artist}}</a> </td>
@@ -33,6 +30,7 @@ bgcolor=#FFFFFF
     <td><center><a href="/queue/remove/{{item[0]}}/{{item[1].sid}}">X</a></center></td>
     <td><center><a href="/queue/moveup/{{item[0]}}/{{item[1].sid}}">&uarr;</a></center></td>
     <td><center><a href="/queue/movedown/{{item[0]}}/{{item[1].sid}}">&darr;</a></center></td>
+  </strong>
 {% else %}
     <td></td>
     <td></td>

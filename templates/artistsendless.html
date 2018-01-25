@@ -21,7 +21,7 @@ $(document).ready(function() {
         }
 
         function populate_table() {
-            qurl = '/songs/title/' + offset + '/' + (offset + chunk) + '?name={{name}}'
+            qurl = '/songs/artist/' + offset + '/' + (offset + chunk) + '/'
             jQuery.get(qurl, '', get_success)
         }
 
