@@ -1,11 +1,9 @@
 #!/usr/bin/env python
 
-
 import sys
 import songs
 import fairqueue
 import urllib
-from cachedict import CacheDict
 
 from flask import Flask, render_template, request, redirect, make_response
 app = Flask(__name__, static_url_path='/static')
@@ -20,8 +18,6 @@ singers = ['Kent', 'Lisa', 'Nels', 'Frosty']
 for singer in singers:
     for i in range(5):
         queue.add(singer, songlist.random().sid)
-
-search_cache = CacheDict()
 
 #####################
 # Generic functions #
@@ -57,11 +53,15 @@ def singer_name():
 @app.route('/songs/artist/')
 def root():
     name = singer_name()
+    if not name:
+        return render_template('setname.html')
     return search_box('') + render_template('artistsendless.html', songlist=songlist.by_artist, name=name)
 
 @app.route('/songs/artist/<aid>')
 def by_artist(aid=None):
     name = singer_name()
+    if not name:
+        return render_template('setname.html')
     if aid:
         results = songlist.all_by_artist(int(aid))
     else:
@@ -71,46 +71,52 @@ def by_artist(aid=None):
 @app.route('/songs/title/')
 def by_title():
     name = singer_name()
+    if not name:
+        return render_template('setname.html')
     return search_box('') + '<center>SONGS BY TITLE</center><p>' + \
                     render_template('songsendless.html', name=name)
 
 @app.route('/songs/title/<start>/<end>/')
 def title_start_end(start=0, end=1):
-    name = fmt(request.args.get('name'))
-    print 'GOT NAME', name
+    name = singer_name()
+    if not name:
+        return render_template('setname.html')
     slist = songlist.songs[int(start):int(end)]
+    print len(slist)
     return render_template('songtable.html', songlist=slist, name=name)
 
 @app.route('/songs/artist/<start>/<end>/')
 def artist_start_end(start=0, end=1):
-    name = fmt(request.args.get('name'))
-    print 'GOT NAME', name
+    name = singer_name()
+    if not name:
+        return render_template('setname.html')
     slist = songlist.by_artist[int(start):int(end)]
+    print len(slist)
     return render_template('songtable.html', songlist=slist, name=name)
 
 @app.route('/songs/search')
 def search():
     name = singer_name()
+    if not name:
+        return render_template('setname.html')
     searchtext = fmt(request.args.get('query'))
     print 'SEARCHED QUERY', searchtext
-    if searchtext in search_cache:
-        print 'Cache hit on', searchtext
-        results = search_cache[searchtext]
-    else:
-        print 'Cache miss on', searchtext
-        results = songlist.search(searchtext.split())
-        search_cache[searchtext] = results
+    results = songlist.search(searchtext)
     return search_box(searchtext) + render_template('songs.html', songlist=results, name=name)
 
 
 @app.route('/artists/')
 def artists():
     name = singer_name()
+    if not name:
+        return render_template('setname.html')
     return search_box('') + render_template('artists.html', name=name)
 
 @app.route('/artists/<start>/<end>')
 def artists_list(start=0, end=1):
     name = singer_name()
+    if not name:
+        return render_template('setname.html')
     artistlist = songlist.artists[int(start): int(end)]
     return render_template('artistslist.html', artistlist=artistlist, name=name)
 
@@ -123,6 +129,8 @@ def artists_list(start=0, end=1):
 @app.route('/queue/display/<singer>')
 def queue_display(singer=None):
     name = singer_name()
+    if not name:
+        return render_template('setname.html')
     if singer:
         header = '%s\'s Queue' % singer
         namequeue = [(item.key, songlist[item.data]) for item in queue[singer]]
@@ -133,6 +141,9 @@ def queue_display(singer=None):
 
 @app.route('/queue/add/<singer>/<sid>')
 def queue_add(sid, singer=None):
+    name = singer_name()
+    if not name:
+        return render_template('setname.html')
     sid = int(sid)
     try:
         song = songlist[sid]

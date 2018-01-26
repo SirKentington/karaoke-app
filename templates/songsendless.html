@@ -11,13 +11,15 @@
 
 <script>
 $(document).ready(function() {
-        var fudge = 50
+        var fudge = 10
         var chunk = 100 //Entries to load at once
         var offset = 0
+        var wait = 0
 
         function get_success(resp) {
-            $('#songs tr:last').after(resp)
             offset = offset + chunk
+            $('#songs tr:last').after(resp)
+            wait = 0
         }
 
         function populate_table() {
@@ -31,7 +33,10 @@ $(document).ready(function() {
 
         $(window).scroll(function() {
             if ($(window).scrollTop() >= $(document).height() - window.innerHeight - fudge) {
-              populate_table()
+              if (wait == 0) {
+                  wait = 1
+                  populate_table()
+              }
             }
         });
 

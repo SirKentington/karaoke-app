@@ -10,6 +10,25 @@ import urllib
 Song = namedtuple('Song', 'artist title aid sid')
 Artist = namedtuple('Artist', 'artist aid')
 
+class CacheDict(object):
+    def __init__(self, size=512):
+        self._dict = {}
+        self._lru_list = []
+        self._max_cache = size
+
+    def __contains__(self, key):
+        return key in self._dict
+
+    def __getitem__(self, key):
+        return self._dict[key]
+
+    def __setitem__(self, key, val):
+        self._dict[key] = val
+        self._lru_list.append(key)
+        if len(self._lru_list) >= self._max_cache:
+            oldkey = self._lru_list.pop(0)
+            del self._dict[oldkey]
+
 class Incrementor(object):
     def __init__(self):
         self.n = 0
@@ -56,16 +75,23 @@ class SongList(object):
         self.songs = songs
         self.by_title = songs
         self.by_artist = sorted(self.songs)
+        self.search_cache = CacheDict()
         print 'Finished reading in songlist'
 
-    def search(self, queries):
-        if len(queries) == 0:
+    def search(self, query):
+        if len(query) == 0:
             return []
+        if query in self.search_cache:
+            print 'Cache hit on', query
+            return self.search_cache[query]
+        print 'Cache miss on', query
         results_list = []
+        queries = query.split()
         for song in self.songs:
-            if all(re.search(query, song.artist + ' ' + song.title, re.IGNORECASE) for query in queries):
+            if all(re.search(q, song.artist + ' ' + song.title, re.IGNORECASE) for q in queries):
                 results_list.append(song);
         results_list.sort()
+        self.search_cache[query] = results_list
         return results_list
 
     def all_by_artist(self, aid=None):
