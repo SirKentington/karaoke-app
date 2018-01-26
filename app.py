@@ -42,7 +42,7 @@ def icon():
 def singer_name():
     name = request.cookies.get(singer_cookie_name)
     if not name:
-        return ''
+        return None
     return name
 
 ####################
@@ -172,9 +172,7 @@ def queue_move_down(singer=None, sid=None):
 @app.route('/queue/setname')
 def set_singer_name():
     singer = fmt(request.args.get('singer'))
-    if not singer:
-        return render_template('setname.html')
-    resp = make_response(redirect('/songs'))
+    resp = make_response(redirect('/'))
     resp.set_cookie(singer_cookie_name, singer)
     return resp
 
