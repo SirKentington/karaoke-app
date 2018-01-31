@@ -3,21 +3,23 @@
 <script src="https://code.jquery.com/jquery-2.0.0.min.js"></script>
 
 <center>
-<ul id="artists">
-    <li>Artists</li>
-</ul>
+<table id="artists">
+    <tr><th></th><th>Artists</th><th></th></tr>
+</table>
 </center>
 
 <script>
 $(document).ready(function() {
         var fudge = 50
-        var chunk = 100 //Entries to load at once
+        var chunk = 99 //Entries to load at once
         var offset = 0
+        var wait = false
 
         function get_success(resp) {
             console.log(resp)
-            $('#artists li:last').after(resp)
+            $('#artists tr:last').after(resp)
             offset = offset + chunk
+            wait = false
         }
 
         function populate_table() {
@@ -31,10 +33,12 @@ $(document).ready(function() {
 
         $(window).scroll(function() {
             if ($(window).scrollTop() >= $(document).height() - window.innerHeight - fudge) {
-              populate_table()
+              if (wait == false) {
+                wait = true
+                populate_table()
+              }
             }
         });
 
 });
 </script>
-

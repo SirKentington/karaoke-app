@@ -1,0 +1,17 @@
+<link rel="stylesheet" type="text/css" href="/static/style.css" />
+
+<script src="https://code.jquery.com/jquery-2.0.0.min.js"></script>
+
+<center>
+<table id="artists">
+    <tr><th></th><th>Artists</th><th></th></tr>
+  </tr>
+    {% for artist in artistlist %}
+      <td><a href="/songs/artist/{{artist.aid}}">{{artist.artist}}</a></td>
+      {% if loop.index is divisibleby 3 %}
+      </tr><tr>
+      {% endif %}
+    {% endfor %}
+    </tr>
+</table>
+</center>

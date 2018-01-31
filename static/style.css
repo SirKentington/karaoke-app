@@ -15,13 +15,13 @@ a:visited {
   color:            blue;
   }
 
-#songs {
+#songs, #artists {
     font-family: "Trebuchet MS", Arial, Helvetica, sans-serif;
     border-collapse: collapse;
     width: 100%;
 }
 
-#songs td, #songs th {
+#songs td, #songs th, #artists td, #artists th {
     border: 1px solid #ddd;
     padding: 6px;
 }
@@ -30,7 +30,11 @@ a:visited {
 
 #songs tr:hover {background-color: #ddd;}
 
-#songs th {
+#artists tr:nth-child(even){background-color: #f2f2f2;}
+
+#artists tr:hover {background-color: #ddd;}
+
+#songs th, #artists th {
     padding-top: 8px;
     padding-bottom: 8px;
     text-align: center;

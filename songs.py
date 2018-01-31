@@ -55,7 +55,11 @@ class SongList(object):
             for line in f.readlines():
                 if line.isspace():
                     continue
-                (artist, title) = [x.decode('utf-8').strip() for x in line.split('#', 1)]
+                try:
+                    (artist, title) = [x.decode('utf-8').strip() for x in re.split(r'###', line, 1)]
+                except ValueError:
+                    print 'Line not formatted correctly:', line
+                    continue
                 artist = artist[:30]
                 tmp_songlist.append((artist, title))
         # Filter out dups and sort by title
@@ -71,7 +75,7 @@ class SongList(object):
         self.artist_to_aid = artist_to_aid
         self._aid_dict = aid_dict
         self._sid_dict = sid_dict
-        self.artists = sorted([Artist(key, val) for key, val in self.artist_to_aid.items()])
+        self.artists = sorted([Artist(key, val) for key, val in self.artist_to_aid.items()], key=lambda x:x.artist.upper())
         self.songs = songs
         self.by_title = songs
         self.by_artist = sorted(self.songs)

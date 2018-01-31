@@ -1,4 +1,9 @@
+<tr>
 {% for artist in artistlist %}
-<li><a href="/songs/artist/{{artist.aid}}">{{artist.artist}}</a></li>
+  <td><a href="/songs/artist/{{artist.aid}}">{{artist.artist}}</a></td>
+{% if loop.index is divisibleby 3 %}
+</tr>
+<tr>
+{% endif %}
 {% endfor %}
-
+</tr>

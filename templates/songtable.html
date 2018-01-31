@@ -3,10 +3,11 @@
     <td> {{song.title}}  </td>
     <td>
         {% if name != '' %}
-            <form action="/queue/add/{{name}}/{{song.sid}}">
+            <a href="/queue/add/{{name}}/{{song.sid}}">Queue</a>
+            <!--form action="/queue/add/{{name}}/{{song.sid}}">
                 <input type="submit" value="Queue" />
-            </form>
+            </form!-->
         {% endif %}
-    <td>
+    </td>
 </tr>
 {% endfor %}

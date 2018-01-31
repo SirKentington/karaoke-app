@@ -2,12 +2,24 @@
 from collections import defaultdict
 from collections import namedtuple
 
+import pickle
+
 #Data = namedtuple('Data', 'key data')
+
+backup_file = 'queue.backup'
 
 class Data(object):
     def __init__(self, key, data):
         self.key = key
         self.data = data
+
+def create_queue():
+    try:
+        with open(backup_file, 'r') as f:
+            return pickle.load(f)
+    except:
+        pass
+    return FairQueue()
 
 class FairQueue(object):
 
@@ -18,6 +30,10 @@ class FairQueue(object):
 
     def __init__(self):
         self.queue = []
+
+    def save(self):
+        with open(backup_file, 'w') as f:
+            pickle.dump(self, f)
 
     def _last_key_pos(self, key):
         # Find the last occurrence of key
@@ -34,31 +50,41 @@ class FairQueue(object):
             return
 
         # See if a placeholder exists
-        for n, elem in enumerate(self.queue[:]):
-            if elem.key == key and elem.data is None:
-                elem.data = data
-                return
+#        for n, elem in enumerate(self.queue[:]):
+#            if elem.key == key and elem.data is None:
+#                elem.data = data
+#                self.save()
+#                return
 
-        seen = set()
         try:
             pos = self._last_key_pos(key)
         except ValueError:
             pos = 0
 
+        seen = set()
         for n, elem in enumerate(self.queue[pos:]):
             if elem.key in seen:
                 self.queue.insert(pos + n, Data(key, data))
+                self.save()
                 return
             else:
                 seen.add(elem.key)
-
         self.queue.append(Data(key, data))
+        self.save()
+
+    def reorder(self):
+        oldq = self.queue
+        self.queue = []
+        for item in oldq:
+            self.add(item.key, item.data)
+        self.save()
 
     def remove(self, key, data):
-        for elem in self.queue[:]:
+        for n, elem in enumerate(self.queue[:]):
             if elem.key == key and elem.data == data:
                 print 'Found removal for', key, data
-                elem.data = None
+                self.queue.remove(elem)
+                self.reorder()
                 return
 
     def moveup(self, key, data):
@@ -72,6 +98,7 @@ class FairQueue(object):
                     last.data = data
                 else:
                     last = item
+        self.save()
 
     def movedown(self, key, data):
         last = None
@@ -81,11 +108,13 @@ class FairQueue(object):
             elif item.key == key and last is not None:
                 last.data = item.data
                 item.data = data
+                self.save()
                 return
 
     def addlist(self, key, datalist):
         for data in datalist:
             self.add(key, data)
+        self.save()
 
     def pop(self):
         while True:

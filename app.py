@@ -9,15 +9,18 @@ from flask import Flask, render_template, request, redirect, make_response
 app = Flask(__name__, static_url_path='/static')
 
 songlist = songs.SongList(sys.argv[1])
-queue = fairqueue.FairQueue()
+queue = fairqueue.create_queue()
 
 singer_cookie_name = 'kent_karaoke.singer_name'
 
 # Add a series of random songs for testing the queue
 singers = ['Kent', 'Lisa', 'Nels', 'Frosty']
+singers = []
 for singer in singers:
     for i in range(5):
         queue.add(singer, songlist.random().sid)
+
+lettercache = {}
 
 #####################
 # Generic functions #
@@ -49,6 +52,35 @@ def singer_name():
 # Displaying Songs #
 ####################
 @app.route('/')
+@app.route('/artists/')
+def artists():
+    name = singer_name()
+    if not name:
+        return render_template('setname.html')
+    return search_box('') + render_template('artists.html', name=name)
+
+@app.route('/artists/letter/<letter>')
+def artist_by_letter(letter=None):
+    if letter is None:
+        return
+    letter = letter.upper()
+    if letter in lettercache:
+        return search_box('') + render_template('artistslist.html', artistlist=lettercache[letter])
+    artistlist = []
+    for artist in songlist.artists:
+        if artist.artist.upper().startswith(letter):
+            artistlist.append(artist)
+    lettercache[letter.upper()] = artistlist
+    return search_box('') + render_template('artistsletter.html', artistlist=artistlist)
+
+@app.route('/artists/<start>/<end>')
+def artists_list(start=0, end=1):
+    name = singer_name()
+    if not name:
+        return render_template('setname.html')
+    artistlist = songlist.artists[int(start): int(end)]
+    return render_template('artistslist.html', artistlist=artistlist, name=name)
+
 @app.route('/songs')
 @app.route('/songs/artist/')
 def root():
@@ -104,23 +136,6 @@ def search():
     results = songlist.search(searchtext)
     return search_box(searchtext) + render_template('songs.html', songlist=results, name=name)
 
-
-@app.route('/artists/')
-def artists():
-    name = singer_name()
-    if not name:
-        return render_template('setname.html')
-    return search_box('') + render_template('artists.html', name=name)
-
-@app.route('/artists/<start>/<end>')
-def artists_list(start=0, end=1):
-    name = singer_name()
-    if not name:
-        return render_template('setname.html')
-    artistlist = songlist.artists[int(start): int(end)]
-    return render_template('artistslist.html', artistlist=artistlist, name=name)
-
-
 ####################
 # Displaying Queue #
 ####################
@@ -137,7 +152,7 @@ def queue_display(singer=None):
     else:
         header = 'All Singers Queue'
         namequeue = [(item.key, songlist[item.data]) for item in queue]
-    return render_template('queue.html', queue=namequeue, name=name, header=header)
+    return search_box('') + render_template('queue.html', queue=namequeue, name=name, header=header)
 
 @app.route('/queue/add/<singer>/<sid>')
 def queue_add(sid, singer=None):
@@ -170,13 +185,15 @@ def queue_move_down(singer=None, sid=None):
     return queue_display(singer=None)
 
 @app.route('/queue/setname')
-def set_singer_name():
+def set_name():
     singer = fmt(request.args.get('singer'))
-    resp = make_response(redirect('/'))
+    if singer is None:
+        return render_template('setname.html')
+    resp = make_response(render_template('redirect.html'))
     resp.set_cookie(singer_cookie_name, singer)
     return resp
 
 if __name__ == '__main__':
-    app.run(host="0.0.0.0", port=8080, debug=True)
+    app.run(host="0.0.0.0", port=80, debug=True)
 
 # vim: set expandtab sw=4 ts=4:

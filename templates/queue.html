@@ -4,11 +4,10 @@
 <meta name="viewport" content="width=device-width, initial-scale=1" />
 </head>
 
-<center>
-<a href="/songs">Song List</a><br>
-<a href="/queue">Queue</a><br>
-Singer: {{name}} <a href="/queue/setname">(Not you?)</a><br>
-<big><bold>{{header}}</bold></big><br>
+<script>
+setTimeout("location.reload(true);", 60000)
+</script>
+
 <table id="queue">
 <tr><th> Spot </th>
     <th> Singer </th>
@@ -18,23 +17,33 @@ Singer: {{name}} <a href="/queue/setname">(Not you?)</a><br>
     <th> &uarr; </th>
     <th> &darr; </th>
 {% for item in queue %}
-<tr>
 {% if name == item[0] %}
-<strong>
-{% endif %}
+<tr>
+<td style="background-color:#42c5f4">  {{loop.index}} </td>
+<td style="background-color:#42c5f4"> <a href="/queue/display/{{item[0]}}"> {{item[0]}} </a> </td>
+<td style="background-color:#42c5f4"> <a href="/songs/artist/{{item[1].aid}}">{{item[1].artist}}</a> </td>
+<td style="background-color:#42c5f4"> {{item[1].title}} </td>
+<td style="background-color:#42c5f4"><center><a href="/queue/remove/{{item[0]}}/{{item[1].sid}}">X</a></center></td>
+<td style="background-color:#42c5f4"><center><a href="/queue/moveup/{{item[0]}}/{{item[1].sid}}">&uarr;</a></center></td>
+<td style="background-color:#42c5f4"><center><a href="/queue/movedown/{{item[0]}}/{{item[1].sid}}">&darr;</a></center></td>
+{% elif name == 'AdminBirthdayBoy' %}
+<tr>
 <td>  {{loop.index}} </td>
 <td> <a href="/queue/display/{{item[0]}}"> {{item[0]}} </a> </td>
 <td> <a href="/songs/artist/{{item[1].aid}}">{{item[1].artist}}</a> </td>
 <td> {{item[1].title}} </td>
-{% if name == item[0] %}
-    <td><center><a href="/queue/remove/{{item[0]}}/{{item[1].sid}}">X</a></center></td>
-    <td><center><a href="/queue/moveup/{{item[0]}}/{{item[1].sid}}">&uarr;</a></center></td>
-    <td><center><a href="/queue/movedown/{{item[0]}}/{{item[1].sid}}">&darr;</a></center></td>
-  </strong>
+<td><center><a href="/queue/remove/{{item[0]}}/{{item[1].sid}}">X</a></center></td>
+<td></td>
+<td></td>
 {% else %}
-    <td></td>
-    <td></td>
-    <td></td>
+<tr>
+<td>  {{loop.index}} </td>
+<td> <a href="/queue/display/{{item[0]}}"> {{item[0]}} </a> </td>
+<td> <a href="/songs/artist/{{item[1].aid}}">{{item[1].artist}}</a> </td>
+<td> {{item[1].title}} </td>
+<td></td>
+<td></td>
+<td></td>
 {% endif %}
 </tr>
 {% endfor %}

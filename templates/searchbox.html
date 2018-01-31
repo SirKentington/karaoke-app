@@ -8,9 +8,46 @@
 <!--img src=/static/batman.jpg style="width:300px"!--><p>
 You are {{name}} <a href="/queue/setname">(Change?)</a><br>
 <a style="text-align:center" href="/queue/display/">Singer Queue</a><br>
-List Songs by <a style="text-align:center" href="/songs/artist/">Artist</a>
+<a style="text-align:center" href="/artists/">All Artists</a><br>
+Artists by Letter
+<select id="ArtistByLetter" style="text-align:center">
+  <option value="/artists/letter/A">A</option>
+  <option value="/artists/letter/B">B</option>
+  <option value="/artists/letter/C">C</option>
+  <option value="/artists/letter/D">D</option>
+  <option value="/artists/letter/E">E</option>
+  <option value="/artists/letter/F">F</option>
+  <option value="/artists/letter/G">G</option>
+  <option value="/artists/letter/H">H</option>
+  <option value="/artists/letter/I">I</option>
+  <option value="/artists/letter/J">J</option>
+  <option value="/artists/letter/K">K</option>
+  <option value="/artists/letter/L">L</option>
+  <option value="/artists/letter/M">M</option>
+  <option value="/artists/letter/N">N</option>
+  <option value="/artists/letter/O">O</option>
+  <option value="/arists/letter/P">P</option>
+  <option value="/artists/letter/Q">Q</option>
+  <option value="/artists/letter/R">R</option>
+  <option value="/artists/letter/S">S</option>
+  <option value="/artists/letter/T">T</option>
+  <option value="/artists/letter/U">U</option>
+  <option value="/artists/letter/V">V</option>
+  <option value="/artists/letter/W">W</option>
+  <option value="/artists/letter/X">X</option>
+  <option value="/artists/letter/Y">Y</option>
+  <option value="/artists/letter/Z">Z</option>
+</select>
+<button id="ArtistByLetterGo" onclick="gotosite()">Go</button>
+<br>
+Songs by <a style="text-align:center" href="/songs/artist/">Artist</a>
 or <a style="text-align:center" href="/songs/title/">Title</a><br>
-</center>
+
+<script>
+function gotosite() {
+  window.location = document.getElementById("ArtistByLetter").value; // JQuery:  $("#menu").val();
+}
+</script>
 
 <div id="tfheader" style="text-align:center">
     <form action="/songs/search" id="tfnewsearch" method="get">
