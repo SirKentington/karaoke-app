@@ -1,33 +1,33 @@
 #!/usr/bin/env python
-
+from __future__ import print_function
 from collections import namedtuple
 from collections import defaultdict
+from collections import OrderedDict
 import random
 import re
 import urllib
 
-#Song = namedtuple('Song', 'artist title artist_url title_url sid')
 Song = namedtuple('Song', 'artist title aid sid')
 Artist = namedtuple('Artist', 'artist aid')
 
 class CacheDict(object):
-    def __init__(self, size=512):
-        self._dict = {}
-        self._lru_list = []
+    def __init__(self, size=0):
+        self._dict = OrderedDict()
         self._max_cache = size
 
     def __contains__(self, key):
         return key in self._dict
 
     def __getitem__(self, key):
-        return self._dict[key]
+        val = self._dict[key]
+        del self._dict[key]
+        self._dict[key] = val
+        return val
 
     def __setitem__(self, key, val):
         self._dict[key] = val
-        self._lru_list.append(key)
-        if len(self._lru_list) >= self._max_cache:
-            oldkey = self._lru_list.pop(0)
-            del self._dict[oldkey]
+        if len(self._dict) >= self._max_cache:
+            self._dict.popitem()
 
 class Incrementor(object):
     def __init__(self):
@@ -40,7 +40,7 @@ class Incrementor(object):
 class SongList(object):
 
     def __init__(self, filename):
-        print 'Reading in songlist'
+        print('Reading in songlist')
         tmp_songlist = []
         aid = 0
         aid_inc = Incrementor()
@@ -58,7 +58,7 @@ class SongList(object):
                 try:
                     (artist, title) = [x.decode('utf-8').strip() for x in re.split(r'###', line, 1)]
                 except ValueError:
-                    print 'Line not formatted correctly:', line
+                    print('Line not formatted correctly:', line)
                     continue
                 artist = artist[:30]
                 tmp_songlist.append((artist, title))
@@ -80,15 +80,15 @@ class SongList(object):
         self.by_title = songs
         self.by_artist = sorted(self.songs)
         self.search_cache = CacheDict()
-        print 'Finished reading in songlist'
+        print('Finished reading in songlist')
 
     def search(self, query):
         if len(query) == 0:
             return []
         if query in self.search_cache:
-            print 'Cache hit on', query
+            print('Cache hit on', query)
             return self.search_cache[query]
-        print 'Cache miss on', query
+        print('Cache miss on', query)
         results_list = []
         queries = query.split()
         for song in self.songs:

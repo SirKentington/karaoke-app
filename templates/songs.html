@@ -1,5 +1,20 @@
 <link rel="stylesheet" type="text/css" href="/static/style.css" />
 
+<script src="https://code.jquery.com/jquery-2.0.0.min.js"></script>
+<script>
+function add_song(name, id) {
+  $.ajax({
+   url: '/queue/api/add/' + name + '/' + id,
+   type: 'PUT',
+   success: function(response) {
+      console.log('Got good response')
+      return false;
+   }
+});
+return false;
+}
+</script>
+
 <center>
 <table id="songs">
 <tr><th> Artist </th> <th> Title </th> <th></th>
@@ -8,10 +23,9 @@
     <td> {{song.title}}  </td>
     <td>
         {% if name != '' %}
-            <a href="/queue/add/{{name}}/{{song.sid}}">Queue</a>
-            <!--form action="/queue/add/{{name}}/{{song.sid}}">
-                <input type="submit" value="Queue" />
-            </form!-->
+            <form>
+                <input type="submit" value="Queue" onclick="return add_song('{{name}}', '{{song.sid}}');"/>
+            </form>
         {% endif %}
 {% endfor %}
     </td>

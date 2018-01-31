@@ -3,6 +3,19 @@
 </style>
 <script src="https://code.jquery.com/jquery-2.0.0.min.js"></script>
 
+<script>
+function add_song(name, id) {
+  console.log('add_song called' + name + ' ' + id)
+  $.ajax({
+   url: '/queue/api/add/' + name + '/' + id,
+   type: 'PUT',
+   success: function(response) {
+      console.log('Got good response')
+   }
+});
+}
+</script>
+
 <center>
 <table id="songs">
 <tr><th> Artist </th> <th> Title </th> <th></th></tr>

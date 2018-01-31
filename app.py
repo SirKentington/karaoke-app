@@ -1,5 +1,5 @@
 #!/usr/bin/env python
-
+from __future__ import print_function
 import sys
 import songs
 import fairqueue
@@ -9,7 +9,7 @@ from flask import Flask, render_template, request, redirect, make_response
 app = Flask(__name__, static_url_path='/static')
 
 songlist = songs.SongList(sys.argv[1])
-queue = fairqueue.create_queue()
+queue = fairqueue.create_queue('derp')
 
 singer_cookie_name = 'kent_karaoke.singer_name'
 
@@ -114,7 +114,7 @@ def title_start_end(start=0, end=1):
     if not name:
         return render_template('setname.html')
     slist = songlist.songs[int(start):int(end)]
-    print len(slist)
+    print(len(slist))
     return render_template('songtable.html', songlist=slist, name=name)
 
 @app.route('/songs/artist/<start>/<end>/')
@@ -123,7 +123,7 @@ def artist_start_end(start=0, end=1):
     if not name:
         return render_template('setname.html')
     slist = songlist.by_artist[int(start):int(end)]
-    print len(slist)
+    print(len(slist))
     return render_template('songtable.html', songlist=slist, name=name)
 
 @app.route('/songs/search')
@@ -132,7 +132,7 @@ def search():
     if not name:
         return render_template('setname.html')
     searchtext = fmt(request.args.get('query'))
-    print 'SEARCHED QUERY', searchtext
+    print('SEARCHED QUERY', searchtext)
     results = songlist.search(searchtext)
     return search_box(searchtext) + render_template('songs.html', songlist=results, name=name)
 
@@ -154,25 +154,27 @@ def queue_display(singer=None):
         namequeue = [(item.key, songlist[item.data]) for item in queue]
     return search_box('') + render_template('queue.html', queue=namequeue, name=name, header=header)
 
-@app.route('/queue/add/<singer>/<sid>')
+@app.route('/queue/api/add/<singer>/<sid>', methods=['PUT'])
 def queue_add(sid, singer=None):
+    response = make_response()
     name = singer_name()
     if not name:
-        return render_template('setname.html')
+        return '', 403
     sid = int(sid)
     try:
         song = songlist[sid]
     except IndexError:
+        return '', 404
         pass
     if singer is None or singer == 'None' or sid >= len(songlist):
-        return ''
+        return '', 403
     queue.add(singer, sid)
-    return queue_display()
+    return '', 200
 
 @app.route('/queue/remove/<singer>/<sid>')
 def queue_remove(singer=None, sid=None):
     queue.remove(singer, int(sid))
-    return queue_display(singer=None)
+    return ''
 
 @app.route('/queue/moveup/<singer>/<sid>')
 def queue_move_up(singer=None, sid=None):

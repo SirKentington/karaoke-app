@@ -3,6 +3,9 @@
     <td> {{song.title}}  </td>
     <td>
         {% if name != '' %}
+        <form>
+            <input type="submit" value="Queue" onclick="add_song({{name}}, {{song.sid}});"/>
+        </form>
             <a href="/queue/add/{{name}}/{{song.sid}}">Queue</a>
             <!--form action="/queue/add/{{name}}/{{song.sid}}">
                 <input type="submit" value="Queue" />
